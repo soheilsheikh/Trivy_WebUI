@@ -9,7 +9,7 @@ This software is licensed under the GNU General Public License v3.0 - see [GNU G
 ## Prerequisites
 
 * Any Linux-based OS (Ubuntu, Debian, CentOS, etc.)
-* [Trivy scanner](https://github.com/aquasecurity/trivy) (installation instructions provided below)
+* [Trivy scanner](https://aquasecurity.github.io/trivy/) (installation instructions provided below)
 * Node.js and npm (installation instructions provided below)
 
 ## Step 1: Install Trivy
@@ -28,11 +28,11 @@ sudo apt-get install trivy
 
 ### For RHEL/CentOS:
 ```bash
-sudo rpm -ivh https://github.com/aquasecurity/trivy/releases/download/v0.45.1/trivy_0.45.1_Linux-64bit.rpm
+sudo rpm -ivh https://aquasecurity.github.io/trivy/releases/download/v0.45.1/trivy_0.45.1_Linux-64bit.rpm
 ```
 
 ### For other systems:
-Visit [Trivy's GitHub repository](https://github.com/aquasecurity/trivy) for installation instructions for your specific system.
+Visit Trivy's official documentation for installation instructions for your specific system.
 
 Verify the installation:
 ```bash
@@ -68,43 +68,17 @@ node -v
 npm -v
 ```
 
-## Step 3: Create the project directory
+## Step 3: Install Trivy Web Scanner from GitHub
+
+Clone the repository and install dependencies:
 
 ```bash
-mkdir -p ~/trivy-web-scanner/public
-cd ~/trivy-web-scanner
-```
-
-## Step 4: Create the application files
-
-You'll need to create three main files for the application:
-
-1. `server.js` - The backend server
-2. `public/index.html` - The frontend interface
-3. `package.json` - The project configuration
-
-You can use any text editor to create these files. For example:
-
-```bash
-nano server.js
-# Paste your server.js content and save
-
-nano public/index.html
-# Paste your index.html content and save
-
-nano package.json
-# Paste your package.json content and save
-```
-
-## Step 5: Install dependencies
-
-Inside the project directory, run:
-
-```bash
+git clone https://github.com/soheilsheikh/Trivy_WebUI.git
+cd Trivy_WebUI
 npm install
 ```
 
-## Step 6: Run the application
+## Step 4: Run the application
 
 Start the server:
 
@@ -117,7 +91,7 @@ You should see a message similar to:
 Trivy Web Interface running on http://localhost:3000
 ```
 
-## Step 7: Access the web interface
+## Step 5: Access the web interface
 
 ### For local development:
 Simply open your web browser and navigate to http://localhost:3000
@@ -148,9 +122,11 @@ sudo dnf install nginx
 Create a new Nginx site configuration:
 
 ```bash
-sudo nano /etc/nginx/sites-available/trivy-scanner  # For Debian/Ubuntu
-# OR
-sudo nano /etc/nginx/conf.d/trivy-scanner.conf  # For RHEL/CentOS
+# For Debian/Ubuntu
+sudo nano /etc/nginx/sites-available/trivy-scanner
+
+# OR for RHEL/CentOS
+sudo nano /etc/nginx/conf.d/trivy-scanner.conf
 ```
 
 Add the following configuration:
@@ -184,7 +160,7 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-## Step 8: Running as a service (optional)
+## Step 6: Running as a service (optional)
 
 To keep the application running after closing your terminal or rebooting, you can set it up as a system service:
 
@@ -229,7 +205,7 @@ Check the status:
 sudo systemctl status trivy-web
 ```
 
-## Step 9: Security considerations
+## Step 7: Security considerations
 
 1. **Authentication**: Consider implementing authentication for the web interface
 2. **HTTPS**: Configure SSL/TLS if exposing the service publicly
@@ -241,4 +217,4 @@ sudo systemctl status trivy-web
 2. **Permission issues**: Ensure the user running the application has permissions to execute Trivy
 3. **Trivy not found**: Make sure Trivy is installed and in your PATH
 
-For additional support, check the [Trivy documentation](https://aquasecurity.github.io/trivy/) or open an issue on GitHub.
+For additional support, check the Trivy documentation or open an issue on the repository at https://github.com/soheilsheikh/Trivy_WebUI.
