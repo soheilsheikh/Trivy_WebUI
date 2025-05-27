@@ -206,17 +206,6 @@
             font-weight: bold;
         }
         
-        .clickable {
-            cursor: pointer;
-        }
-        
-        .vulnerability-details {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 10px;
-        }
-        
         .accordion {
             background-color: white;
             cursor: pointer;
@@ -280,6 +269,71 @@
 
         .history-item:hover {
             background-color: #f5f5f5;
+        }
+
+        /* Vulnerability Details Styles */
+        .vulnerability-row {
+            cursor: default;
+        }
+
+        .vulnerability-details-row {
+            background-color: #f8f9fa !important;
+        }
+
+        .vulnerability-details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 5px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .toggle-details-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-details-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .vulnerability-details p {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .vulnerability-details ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+
+        .vulnerability-details li {
+            margin-bottom: 3px;
+        }
+
+        .vulnerability-details a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .vulnerability-details a:hover {
+            text-decoration: underline;
+        }
+
+        /* Ensure table rows display properly */
+        .vulnerability-details-row td {
+            padding: 0 !important;
+            border: none !important;
+        }
+
+        .vulnerability-details-row .vulnerability-details {
+            margin: 10px 15px;
         }
     </style>
 </head>
@@ -494,29 +548,64 @@
                                         <th>Installed Version</th>
                                         <th>Fixed Version</th>
                                         <th>Title</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${vulns.map(vuln => `
-                                        <tr class="clickable" data-vuln-id="${vuln.VulnerabilityID}">
+                                        <tr class="vulnerability-row">
                                             <td>${vuln.VulnerabilityID}</td>
                                             <td><span class="badge badge-${(vuln.Severity || 'UNKNOWN').toLowerCase()}">${vuln.Severity || 'UNKNOWN'}</span></td>
                                             <td>${vuln.InstalledVersion || 'N/A'}</td>
                                             <td>${vuln.FixedVersion || 'N/A'}</td>
-                                            <td>${vuln.Title || 'N/A'}</td>
+                                            <td class="tooltip">
+                                                ${vuln.Title ? (vuln.Title.length > 50 ? vuln.Title.substring(0, 50) + '...' : vuln.Title) : 'N/A'}
+                                                ${vuln.Title && vuln.Title.length > 50 ? `<span class="tooltiptext">${vuln.Title}</span>` : ''}
+                                            </td>
+                                            <td>
+                                                <button class="toggle-details-btn" data-vuln-id="${vuln.VulnerabilityID}">
+                                                    <i class="fas fa-chevron-down"></i> Details
+                                                </button>
+                                            </td>
                                         </tr>
-                                        <tr id="details-${vuln.VulnerabilityID}" style="display:none">
-                                            <td colspan="5">
+                                        <tr class="vulnerability-details-row" id="details-${vuln.VulnerabilityID}" style="display: none;">
+                                            <td colspan="6">
                                                 <div class="vulnerability-details">
-                                                    <p><strong>Description:</strong> ${vuln.Description || 'No description available'}</p>
-                                                    ${vuln.References ? `
-                                                        <p><strong>References:</strong></p>
-                                                        <ul>
-                                                            ${vuln.References.map(ref => `<li><a href="${ref}" target="_blank">${ref}</a></li>`).join('')}
-                                                        </ul>
+                                                    <div style="margin-bottom: 10px;">
+                                                        <strong>Vulnerability ID:</strong> ${vuln.VulnerabilityID}
+                                                    </div>
+                                                    <div style="margin-bottom: 10px;">
+                                                        <strong>Description:</strong> 
+                                                        <p style="margin-top: 5px; line-height: 1.5;">${vuln.Description || 'No description available'}</p>
+                                                    </div>
+                                                    ${vuln.References && vuln.References.length > 0 ? `
+                                                        <div style="margin-bottom: 10px;">
+                                                            <strong>References:</strong>
+                                                            <ul style="margin-top: 5px; padding-left: 20px;">
+                                                                ${vuln.References.map(ref => `<li style="margin-bottom: 5px;"><a href="${ref}" target="_blank" rel="noopener noreferrer">${ref}</a></li>`).join('')}
+                                                            </ul>
+                                                        </div>
                                                     ` : ''}
                                                     ${vuln.CVSS ? `
-                                                        <p><strong>CVSS Score:</strong> ${vuln.CVSS.Score} (${vuln.CVSS.Vector})</p>
+                                                        <div style="margin-bottom: 10px;">
+                                                            <strong>CVSS Score:</strong> ${vuln.CVSS.Score || 'N/A'}
+                                                            ${vuln.CVSS.Vector ? `<br><strong>CVSS Vector:</strong> ${vuln.CVSS.Vector}` : ''}
+                                                        </div>
+                                                    ` : ''}
+                                                    ${vuln.Layer ? `
+                                                        <div style="margin-bottom: 10px;">
+                                                            <strong>Layer:</strong> ${vuln.Layer.Digest ? vuln.Layer.Digest.substring(0, 12) + '...' : 'N/A'}
+                                                        </div>
+                                                    ` : ''}
+                                                    ${vuln.SeveritySource ? `
+                                                        <div style="margin-bottom: 10px;">
+                                                            <strong>Severity Source:</strong> ${vuln.SeveritySource}
+                                                        </div>
+                                                    ` : ''}
+                                                    ${vuln.PrimaryURL ? `
+                                                        <div style="margin-bottom: 10px;">
+                                                            <strong>Primary URL:</strong> <a href="${vuln.PrimaryURL}" target="_blank" rel="noopener noreferrer">${vuln.PrimaryURL}</a>
+                                                        </div>
                                                     ` : ''}
                                                 </div>
                                             </td>
@@ -527,13 +616,33 @@
                             
                             panel.appendChild(table);
                             
-                            // Add click events for vulnerability details
-                            panel.querySelectorAll('tr.clickable').forEach(row => {
-                                row.addEventListener('click', () => {
-                                    const vulnId = row.dataset.vulnId;
+                            // Add click events for vulnerability details using event delegation
+                            panel.addEventListener('click', function(e) {
+                                if (e.target.classList.contains('toggle-details-btn') || e.target.parentElement.classList.contains('toggle-details-btn')) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    
+                                    const button = e.target.classList.contains('toggle-details-btn') ? e.target : e.target.parentElement;
+                                    const vulnId = button.dataset.vulnId;
                                     const detailsRow = document.getElementById(`details-${vulnId}`);
-                                    detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
-                                });
+                                    const icon = button.querySelector('i');
+                                    
+                                    if (detailsRow) {
+                                        const isHidden = detailsRow.style.display === 'none';
+                                        detailsRow.style.display = isHidden ? 'table-row' : 'none';
+                                        
+                                        // Update button text and icon
+                                        if (isHidden) {
+                                            icon.className = 'fas fa-chevron-up';
+                                            button.innerHTML = '<i class="fas fa-chevron-up"></i> Hide';
+                                        } else {
+                                            icon.className = 'fas fa-chevron-down';
+                                            button.innerHTML = '<i class="fas fa-chevron-down"></i> Details';
+                                        }
+                                    } else {
+                                        console.error('Details row not found for vulnerability:', vulnId);
+                                    }
+                                }
                             });
                             
                             targetElement.appendChild(accordion);
